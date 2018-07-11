@@ -40,7 +40,7 @@
 				</div>
 				<div class="panel-footer">
 					<br>
-					<p>Version: 1.0.3+</p>
+					<p>Version: 1.0.4</p>
 				</div>
 			</div>
 		</div>
@@ -107,7 +107,6 @@
 			},
 		};
 		var decoder = new WebCodeCamJS("#qr-canvas").buildSelectMenu("#camera-select", "environment|back").init(arrayData);
-		scannerLaser.css('opacity', .5);
 		
 		decodeLocal.addEventListener("click", function() {
 			Page.decodeLocalImage();
