@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html>
     <head>
+		<meta charset="UTF-8">
 		<title>Demo Scanner</title>
 		<link rel="stylesheet" href="css/main.css">
 		<link href="css/bootstrap.min.css" rel="stylesheet">
 		
 		<script src="js/jquery-2.1.1.min.js"></script>
+		<script type="text/javascript" src="js/qrcodelib.js"></script>
+        <script type="text/javascript" src="js/webcodecamjs.js"></script>
 	</head>
 	
 	<body>
@@ -14,7 +17,7 @@
 				<div class="panel-heading" style="display: inline-block;width: 100%;">
                     <h4 style="width:50%;float:left;">WebCodeCam.js Demonstration</h4>
                     <div style="width:50%;float:right;margin-top: 5px;margin-bottom: 5px;text-align: right;">
-                    <select id="cameraId" class="form-control" style="display: inline-block;width: auto;"></select>
+                    <select id="camera-select" class="form-control" style="display: inline-block;width: auto;"></select>
                     <button id="play" data-toggle="tooltip" title="Play" type="button" class="btn btn-success btn-sm"><span class="glyphicon glyphicon-play"></span></button>
                 </div>
 			</div>
@@ -38,116 +41,149 @@
 				</div>
 				<div class="panel-footer">
 					<br>
-					<p>Version: 1.0.1</p>
+					<p>Version: 1.0.2</p>
 				</div>
 			</div>
 		</div>
 	</body>
 	<script>
 		'use strict';
-		var decoder = $('#qr-canvas'),
-			scannerLaser = $('.scanner-laser'),
-			scanQR = $('#scanned-QR'),
-			btnPlay = $('#play'),
-			zoomValue = $('#zoom-value'),
-			_zoom = $('#zoom');
+		function GetElement(_element){
+			if (typeof _element === "string"){
+				var elements = document.querySelectorAll(_element);
+				return typeof elements === "undefined" ? undefined : elements.length > 1 ? elements : elements[0];
+			}
+			return _element;
+		}
+		var txt = "innerText" in HTMLElement.prototype ? "innerText" : "textContent";
+		var scannerLaser = GetElement('.scanner-laser'),
+			scanQR = GetElement('#scanned-QR'),
+			btnPlay = GetElement('#play'),
+			zoomValue = GetElement('#zoom-value'),
+			_zoom = GetElement('#zoom');
 		
-		scannerLaser.css('opacity', .5);
-		
-		btnPlay.click(function(){
-			alert("button is clicked");
+		var arrayData = {
+			autoBrightnessValue: 100,
+			resultFunction: function(res) {
+				[].forEach.call(scannerLaser, function(element) {
+					fadeOut(element, 0.5);
+					setTimeout(function() {
+						fadeIn(element, 0.5);
+					}, 300);
+				});
+				scannedQR[txt] = res.format + ": " + res.code;
+			},
 			
-			if(typeof decoder.data().plugin_WebCodeCam === "undefined"){
-				decoder.WebCodeCam({
-				videoSource: {
-					id: $('select#cameraId').val(),
-					maxWidth: 640,
-					maxHeight: 480
-				},
-				autoBrightnessValue: 120,
-				resultFunction: function(text, imgSrc) {
-					scanQR.text(text);
-					scannerLaser.fadeOut(150, function() {
-						scannerLaser.fadeIn(150);
-					});
-				},
-				getUserMediaError: function() {
-					alert('Sorry, the browser you are using doesn\'t support getUserMedia');
-				},
-				cameraError: function(error) {
-					var p, message = 'Error detected with the following parameters:\n';
+			getDevicesError: function(error) {
+				var p, message = "Error detected with the following parameters:\n";
+				for (p in error) {
+					message += p + ": " + error[p] + "\n";
+				}
+				alert(message);
+			},
+			
+			getUserMediaError: function(error) {
+				var p, message = "Error detected with the following parameters:\n";
+				for (p in error) {
+					message += p + ": " + error[p] + "\n";
+				}
+				alert(message);
+			},
+			
+			cameraError: function(error) {
+				var p, message = "Error detected with the following parameters:\n";
+				if (error.name == "NotSupportedError") {
+					var ans = confirm("Your browser does not support getUserMedia via HTTP!\n(see: https:goo.gl/Y0ZkNV).\n You want to see github demo page in a new window?");
+					if (ans) {
+						
+					}
+				} else {
 					for (p in error) {
-						message += p + ': ' + error[p] + '\n';
+						message += p + ": " + error[p] + "\n";
 					}
 					alert(message);
 				}
-				});
-				sQ.text('Scanning ...');
-				sv.removeClass('disabled');
-				sp.click(function(event) {
-					sv.addClass('disabled');
-					sQ.text('Stopped');
-					decoder.data().plugin_WebCodeCam.cameraStop();
-				});
-				spAll.click(function(event) {
-					sv.addClass('disabled');
-					sQ.text('Stopped');
-					decoder.data().plugin_WebCodeCam.cameraStopAll();
-				});
+			},
+		};
+		var decoder = new WebCodeCamJS("#qr-canvas").buildSelectMenu("#camera-select", "environment|back").init(arrayData);
+		scannerLaser.css('opacity', .5);
+		
+		decodeLocal.addEventListener("click", function() {
+			Page.decodeLocalImage();
+		}, false);
+		
+		btnPlay.addEventListener("click", function() {
+			if (!decoder.isInitialized()) {
+				scannedQR[txt] = "Scanning ...";
 			} else {
-				sv.removeClass('disabled');
-				sQ.text('Scanning ...');
-				decoder.data().plugin_WebCodeCam.cameraPlay();
+				scannedQR[txt] = "Scanning ...";
+				decoder.play();
 			}
-		});
-			
+		}, false);
 			
 		Page.changeZoom = function(param) {
-			if (typeof decoder.data().plugin_WebCodeCam == "undefined") return;
-			var value = typeof param != 'undefined' ? parseFloat(param.toPrecision(2)) : _zoom.val() / 10;				zoomValue.text(zoomValue.text().split(':')[0] + ': ' + value.toString());
-			decoder.data().plugin_WebCodeCam.options.zoom = parseFloat(value);
-			if (typeof param != 'undefined') _zoom.val(a * 10);
+			if (decoder.isInitialized()) {
+				var value = typeof a !== "undefined" ? parseFloat(a.toPrecision(2)) : zoom.value / 10;
+				zoomValue[txt] = zoomValue[txt].split(":")[0] + ": " + value.toString();
+				decoder.options.zoom = value;
+				if (typeof a != "undefined") {
+					zoom.value = a * 10;
+				}
+			}
 		}
 			
-		var getZomm = setInterval(function() {
+		Page.decodeLocalImage = function() {
+			if (decoder.isInitialized()) {
+				decoder.decodeLocalImage(imageUrl.value);
+			}
+			imageUrl.value = null;
+		};
+		
+		var getZoom = setInterval(function() {
 			var temp;
 			try {
-			temp = decoder.data().plugin_WebCodeCam.optimalZoom();
+			temp = decoder.optimalZoom();
 			} catch (e) {
 				temp = 0;
 			}
 			if (temp != 0) {
 				Page.changeZoom(temp);
-				clearInterval(getZomm);
+				clearInterval(getZoom);
 				}
 		}, 500);
 			
-		function gotSources(sourceInfos) {
-			for (var i = 0; i !== sourceInfos.length; ++i) {
-				var sourceInfo = sourceInfos[i];
-				var option = document.createElement('option');
-				option.value = sourceInfo.id;
-				if (sourceInfo.kind === 'video') {
-					var face = sourceInfo.facing == '' ? 'unknown' : sourceInfo.facing;
-					option.text = sourceInfo.label || 'camera ' + (videoSelect.length + 1) + ' (facing: ' + face + ')';
-					videoSelect.appendChild(option);
+		function fadeOut(el, v) {
+			el.style.opacity = 1;
+			(function fade() {
+				if ((el.style.opacity -= 0.1) < v) {
+					el.style.display = "none";
+					el.classList.add("is-hidden");
+				} else {
+					requestAnimationFrame(fade);
 				}
+			})();
+		}	
+		
+		function fadeIn(el, v, display) {
+			if (el.classList.contains("is-hidden")) {
+				el.classList.remove("is-hidden");
 			}
-		}
-			
-		if (typeof MediaStreamTrack.getSources !== 'undefined') {
-			var videoSelect = document.querySelector('select#cameraId');
-			$(videoSelect).change(function(event) {
-				if (typeof decoder.data().plugin_WebCodeCam !== "undefined") {
-					decoder.data().plugin_WebCodeCam.options.videoSource.id = $(this).val();
-					decoder.data().plugin_WebCodeCam.cameraStop();
-					decoder.data().plugin_WebCodeCam.cameraPlay(false);
+			el.style.opacity = 0;
+			el.style.display = display || "block";
+			(function fade() {
+				var val = parseFloat(el.style.opacity);
+				if (!((val += 0.1) > v)) {
+					el.style.opacity = val;
+					requestAnimationFrame(fade);
 				}
-			});
-			MediaStreamTrack.getSources(gotSources);
-		} else {
-			document.querySelector('select#cameraId').remove();
+			})();
 		}
+		
+		document.querySelector("#camera-select").addEventListener("change", function() {
+			if (decoder.isInitialized()) {
+				decoder.stop().play();
+			}
+		});
 	});
 	</script>
 </html>
