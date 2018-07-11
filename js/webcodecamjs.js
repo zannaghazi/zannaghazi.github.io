@@ -44,13 +44,13 @@ var WebCodeCamJS = function(element) {
             successTimeout: 500,
             codeRepetition: true,
             tryVertical: true,
-            frameRate: 15,
-            width: 800,
-            height: 800,
+            frameRate: 30,
+            width: 320,
+            height: 240,
             constraints: {
                 video: {
                     mandatory: {
-                        maxWidth: 800,
+                        maxWidth: 1280,
                         maxHeight: 800
                     },
                     optional: [{
@@ -64,8 +64,8 @@ var WebCodeCamJS = function(element) {
             zoom: 0,
             beep: 'audio/beep.mp3',
             decoderWorker: 'js/DecoderWorker.js',
-            brightness: 50,
-            autoBrightnessValue: 50,
+            brightness: 20,
+            autoBrightnessValue: 0,
             grayScale: 0,
             contrast: 0,
             threshold: 0,
