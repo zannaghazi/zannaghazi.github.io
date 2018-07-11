@@ -40,7 +40,7 @@
 				</div>
 				<div class="panel-footer">
 					<br>
-					<p>Version: 1.0.4+</p>
+					<p>Version: 1.0.5</p>
 				</div>
 			</div>
 		</div>
@@ -48,137 +48,139 @@
 	<script type="text/javascript" src="js/qrcodelib.js"></script>
     <script type="text/javascript" src="js/webcodecamjs.js"></script>
 	<script>
-		'use strict';
-		function GetElement(_element){
-			if (typeof _element === "string"){
-				var elements = document.querySelectorAll(_element);
-				return typeof elements === "undefined" ? undefined : elements.length > 1 ? elements : elements[0];
+		(function(undefined) {
+			'use strict';
+			function GetElement(_element){
+				if (typeof _element === "string"){
+					var elements = document.querySelectorAll(_element);
+					return typeof elements === "undefined" ? undefined : elements.length > 1 ? elements : elements[0];
+				}
+				return _element;
 			}
-			return _element;
-		}
-		var txt = "innerText" in HTMLElement.prototype ? "innerText" : "textContent";
-		var scannerLaser = GetElement('.scanner-laser'),
-			scanQR = GetElement('#scanned-QR'),
-			btnPlay = GetElement('#play'),
-			zoomValue = GetElement('#zoom-value'),
-			_zoom = GetElement('#zoom');
-		
-		var arrayData = {
-			autoBrightnessValue: 100,
-			resultFunction: function(res) {
-				[].forEach.call(scannerLaser, function(element) {
-					fadeOut(element, 0.5);
-					setTimeout(function() {
-						fadeIn(element, 0.5);
-					}, 300);
-				});
-				scannedQR[txt] = res.format + ": " + res.code;
-			},
+			var txt = "innerText" in HTMLElement.prototype ? "innerText" : "textContent";
+			var scannerLaser = GetElement('.scanner-laser'),
+				scanQR = GetElement('#scanned-QR'),
+				btnPlay = GetElement('#play'),
+				zoomValue = GetElement('#zoom-value'),
+				_zoom = GetElement('#zoom');
 			
-			getDevicesError: function(error) {
-				var p, message = "Error detected with the following parameters:\n";
-				for (p in error) {
-					message += p + ": " + error[p] + "\n";
-				}
-				alert(message);
-			},
-			
-			getUserMediaError: function(error) {
-				var p, message = "Error detected with the following parameters:\n";
-				for (p in error) {
-					message += p + ": " + error[p] + "\n";
-				}
-				alert(message);
-			},
-			
-			cameraError: function(error) {
-				var p, message = "Error detected with the following parameters:\n";
-				if (error.name == "NotSupportedError") {
-					var ans = confirm("Your browser does not support getUserMedia via HTTP!\n(see: https:goo.gl/Y0ZkNV).\n You want to see github demo page in a new window?");
-					if (ans) {
-						
-					}
-				} else {
+			var arrayData = {
+				autoBrightnessValue: 100,
+				resultFunction: function(res) {
+					[].forEach.call(scannerLaser, function(element) {
+						fadeOut(element, 0.5);
+						setTimeout(function() {
+							fadeIn(element, 0.5);
+						}, 300);
+					});
+					scannedQR[txt] = res.format + ": " + res.code;
+				},
+				
+				getDevicesError: function(error) {
+					var p, message = "Error detected with the following parameters:\n";
 					for (p in error) {
 						message += p + ": " + error[p] + "\n";
 					}
 					alert(message);
-				}
-			},
-		};
-		var decoder = new WebCodeCamJS("#qr-canvas").buildSelectMenu("#camera-select", "environment|back").init(arrayData);
+				},
 				
-		btnPlay.addEventListener("click", function() {
-			if (!decoder.isInitialized()) {
-				scannedQR[txt] = "Scanning ...";
-			} else {
-				scannedQR[txt] = "Scanning ...";
-				decoder.play();
-			}
-		}, false);
-			
-		Page.changeZoom = function(param) {
-			if (decoder.isInitialized()) {
-				var value = typeof a !== "undefined" ? parseFloat(a.toPrecision(2)) : zoom.value / 10;
-				zoomValue[txt] = zoomValue[txt].split(":")[0] + ": " + value.toString();
-				decoder.options.zoom = value;
-				if (typeof a != "undefined") {
-					zoom.value = a * 10;
-				}
-			}
-		}
-			
-		Page.decodeLocalImage = function() {
-			if (decoder.isInitialized()) {
-				decoder.decodeLocalImage(imageUrl.value);
-			}
-			imageUrl.value = null;
-		};
-		
-		var getZoom = setInterval(function() {
-			var temp;
-			try {
-			temp = decoder.optimalZoom();
-			} catch (e) {
-				temp = 0;
-			}
-			if (temp != 0) {
-				Page.changeZoom(temp);
-				clearInterval(getZoom);
-				}
-		}, 500);
-			
-		function fadeOut(el, v) {
-			el.style.opacity = 1;
-			(function fade() {
-				if ((el.style.opacity -= 0.1) < v) {
-					el.style.display = "none";
-					el.classList.add("is-hidden");
+				getUserMediaError: function(error) {
+					var p, message = "Error detected with the following parameters:\n";
+					for (p in error) {
+						message += p + ": " + error[p] + "\n";
+					}
+					alert(message);
+				},
+				
+				cameraError: function(error) {
+					var p, message = "Error detected with the following parameters:\n";
+					if (error.name == "NotSupportedError") {
+						var ans = confirm("Your browser does not support getUserMedia via HTTP!\n(see: https:goo.gl/Y0ZkNV).\n You want to see github demo page in a new window?");
+						if (ans) {
+							
+						}
+					} else {
+						for (p in error) {
+							message += p + ": " + error[p] + "\n";
+						}
+						alert(message);
+					}
+				},
+			};
+			var decoder = new WebCodeCamJS("#qr-canvas").buildSelectMenu("#camera-select", "environment|back").init(arrayData);
+					
+			btnPlay.addEventListener("click", function() {
+				if (!decoder.isInitialized()) {
+					scannedQR[txt] = "Scanning ...";
 				} else {
-					requestAnimationFrame(fade);
+					scannedQR[txt] = "Scanning ...";
+					decoder.play();
 				}
-			})();
-		}	
-		
-		function fadeIn(el, v, display) {
-			if (el.classList.contains("is-hidden")) {
-				el.classList.remove("is-hidden");
-			}
-			el.style.opacity = 0;
-			el.style.display = display || "block";
-			(function fade() {
-				var val = parseFloat(el.style.opacity);
-				if (!((val += 0.1) > v)) {
-					el.style.opacity = val;
-					requestAnimationFrame(fade);
+			}, false);
+				
+			Page.changeZoom = function(param) {
+				if (decoder.isInitialized()) {
+					var value = typeof a !== "undefined" ? parseFloat(a.toPrecision(2)) : zoom.value / 10;
+					zoomValue[txt] = zoomValue[txt].split(":")[0] + ": " + value.toString();
+					decoder.options.zoom = value;
+					if (typeof a != "undefined") {
+						zoom.value = a * 10;
+					}
 				}
-			})();
-		}
-		
-		document.querySelector("#camera-select").addEventListener("change", function() {
-			if (decoder.isInitialized()) {
-				decoder.stop().play();
 			}
-		});
+				
+			Page.decodeLocalImage = function() {
+				if (decoder.isInitialized()) {
+					decoder.decodeLocalImage(imageUrl.value);
+				}
+				imageUrl.value = null;
+			};
+			
+			var getZoom = setInterval(function() {
+				var temp;
+				try {
+				temp = decoder.optimalZoom();
+				} catch (e) {
+					temp = 0;
+				}
+				if (temp != 0) {
+					Page.changeZoom(temp);
+					clearInterval(getZoom);
+					}
+			}, 500);
+				
+			function fadeOut(el, v) {
+				el.style.opacity = 1;
+				(function fade() {
+					if ((el.style.opacity -= 0.1) < v) {
+						el.style.display = "none";
+						el.classList.add("is-hidden");
+					} else {
+						requestAnimationFrame(fade);
+					}
+				})();
+			}	
+			
+			function fadeIn(el, v, display) {
+				if (el.classList.contains("is-hidden")) {
+					el.classList.remove("is-hidden");
+				}
+				el.style.opacity = 0;
+				el.style.display = display || "block";
+				(function fade() {
+					var val = parseFloat(el.style.opacity);
+					if (!((val += 0.1) > v)) {
+						el.style.opacity = val;
+						requestAnimationFrame(fade);
+					}
+				})();
+			}
+			
+			document.querySelector("#camera-select").addEventListener("change", function() {
+				if (decoder.isInitialized()) {
+					decoder.stop().play();
+				}
+			});
+		}).call(window.Page = window.Page || {});
 	</script>
 </html>
