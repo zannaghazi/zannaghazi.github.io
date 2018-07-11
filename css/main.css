@@ -28,3 +28,8 @@
             border-bottom: solid red 5px;
             border-right: solid red 5px;
         }
+}
+
+.camera-test{
+	overflow: hidden;
+}
