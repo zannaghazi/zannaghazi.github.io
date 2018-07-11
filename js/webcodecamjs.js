@@ -50,8 +50,8 @@ var WebCodeCamJS = function(element) {
             constraints: {
                 video: {
                     mandatory: {
-                        maxWidth: 1280,
-                        maxHeight: 720
+                        maxWidth: 800,
+                        maxHeight: 800
                     },
                     optional: [{
                         sourceId: true
@@ -64,8 +64,8 @@ var WebCodeCamJS = function(element) {
             zoom: 0,
             beep: 'audio/beep.mp3',
             decoderWorker: 'js/DecoderWorker.js',
-            brightness: 80,
-            autoBrightnessValue: 80,
+            brightness: 50,
+            autoBrightnessValue: 50,
             grayScale: 0,
             contrast: 0,
             threshold: 0,
