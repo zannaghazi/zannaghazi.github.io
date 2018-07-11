@@ -45,8 +45,8 @@ var WebCodeCamJS = function(element) {
             codeRepetition: true,
             tryVertical: true,
             frameRate: 25,
-            width:600,
-            height: 600 ,
+            width:1100,
+            height: 1100 ,
             constraints: {
                 video: {
                     mandatory: {
