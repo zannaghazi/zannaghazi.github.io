@@ -44,13 +44,13 @@ var WebCodeCamJS = function(element) {
             successTimeout: 500,
             codeRepetition: true,
             tryVertical: true,
-            frameRate: 25,
+            frameRate: 15,
             width:1200,
             height: 1200,
             constraints: {
                 video: {
                     mandatory: {
-                        maxWidth: 599,
+                        maxWidth: 600,
                         maxHeight: 600
                     },
                     optional: [{
