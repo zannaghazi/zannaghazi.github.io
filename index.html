@@ -39,7 +39,7 @@
 				</div>
 				<div class="panel-footer">
 					<br>
-					<p>Version: 1.0.7: test </p>
+					<p>Version: 1.0.7: demo </p>
 				</div>
 			</div>
 		</div>
@@ -63,8 +63,39 @@
 				zoomValue = GetElement('#zoom-value'),
 				_zoom = GetElement('#zoom');
 			
-			var arrayData = {
+			var arrayData = {	
+					decodeQRCodeRate: 5,
+					decodeBarCodeRate: 5,
+					successTimeout: 500,
+					codeRepetition: true,
+					tryVertical: true,
+					frameRate: 15,
+					width:320,
+					height: 240,
+					constraints: {
+					video: {
+						mandatory: {
+							maxWidth: 320,
+							maxHeight: 240
+						},
+						optional: [{
+							sourceId: true
+						}]
+                },
+                audio: false
+				},
+				flipVertical: false,
+				flipHorizontal: false,
+				zoom: -1,
+				beep: 'audio/beep.mp3',
+				decoderWorker: 'js/DecoderWorker.js',
+				brightness: 0,
 				autoBrightnessValue: 100,
+				grayScale: 0,
+				contrast: 0,
+				threshold: 0,
+				sharpness: [],
+				
 				resultFunction: function(res) {
 					[].forEach.call(scannerLaser, function(element) {
 						fadeOut(element, 0.5);
